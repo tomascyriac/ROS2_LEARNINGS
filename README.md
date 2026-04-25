@@ -1,6 +1,6 @@
 # ROS2_LEARNINGS
 
-> **Course:**  Robotics and AI  
+> **Course:**  Entri Robotics and AI  
 > **Mentor/Author:** (https://github.com/arjunskumar) 
 
 ---

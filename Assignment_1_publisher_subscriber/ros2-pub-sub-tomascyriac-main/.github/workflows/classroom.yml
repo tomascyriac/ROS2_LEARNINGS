@@ -1,0 +1,70 @@
+name: Autograding Tests
+on:
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-24.04
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    # 1. Checkout Code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+    # 2. Check Student Edits First (Saves Action Minutes)
+      - name: Verify Student Edits
+        run: |
+          CM_FILE="entri_ros2_pubsub_cpp/CMakeLists.txt"
+          PKG_FILE="entri_ros2_pubsub_cpp/package.xml"
+          MSG_FILE="entri_ros2_pubsub_cpp/msg/RobotStatus.msg"
+          
+          if ! grep -q "rosidl_generate_interfaces" $CM_FILE; then
+             echo "::error::CMakeLists.txt does not generate custom interfaces (rosidl_generate_interfaces)!"
+             exit 1
+          fi
+          
+          if ! grep -q "add_executable(.*publisher_node" $CM_FILE; then
+            echo "::error::CMakeLists.txt is missing add_executable for publisher_node!"
+            exit 1
+          fi
+          
+          if ! grep -q "add_executable(.*subscriber_node" $CM_FILE; then
+            echo "::error::CMakeLists.txt is missing add_executable for subscriber_node!"
+            exit 1
+          fi
+          
+          if ! grep -q "rosidl_default_generators" $PKG_FILE; then
+            echo "::error::package.xml is missing 'rosidl_default_generators' dependency!"
+            exit 1
+          fi
+        shell: bash
+
+    # 3. Setup ROS 2 Jazzy Environment
+      - name: Setup ROS 2
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+
+    # 4. Build Workspace
+      - name: Build Workspace
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon build --packages-select entri_ros2_pubsub_cpp
+        shell: bash
+
+    # 5. Run Autograding
+      - name: Autograding
+        uses: education/autograding@v1
+
+    # 6. Upload Compiled Binaries
+      - name: Upload Compiled Binaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: student-compiled-binaries
+          path: install/

@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "ROS2 Pub/Sub Test",
+      "setup": "chmod +x .github/scripts/grade.sh",
+      "run": "bash .github/scripts/grade.sh",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 15,
+      "points": 100
+    }
+  ]
+}

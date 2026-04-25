@@ -1,0 +1,16 @@
+# RobotTask.srv
+# TODO: Define the custom service for a robot task.
+# 
+# Request:
+# 1. An integer field named 'task_id'
+# 2. A string field named 'task_name'
+#---
+# Response:
+# 1. A boolean field named 'success'
+# 2. A string field named 'task_response'
+int32 task_id
+string task_name
+---
+bool success
+string task_response
+
